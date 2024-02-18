@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Alarm_clock_kotlin" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:statusBarColor">@color/purple_700</item>
+        <!-- その他のテーマ属性をここに追加 -->
+    </style>
+</resources>
