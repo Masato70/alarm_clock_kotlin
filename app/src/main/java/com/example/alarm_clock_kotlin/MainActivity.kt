@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alarm_clock_kotlin.ui.theme.Alarm_clock_kotlinTheme
 
 
-
 class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,9 +23,10 @@ class MainActivity : AppCompatActivity() {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "homeScreen") {
                     composable("homeScreen") { HomeScreen(navController) }
-                    composable("alarmTimePicker") { AlarmTimePicker() }
+                    composable("alarmTimePicker") { AlarmTimePicker(navController) }
                 }
-            }        }
+            }
+        }
     }
 }
 

@@ -1,37 +1,44 @@
 package com.example.alarm_clock_kotlin
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import android.util.Log
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 
 class AlarmViewModel : ViewModel() {
-    var cards: List<CardData> by mutableStateOf(listOf())
-        private set
+    private val _cards = MutableStateFlow<List<CardData>>(emptyList())
+    val cards: StateFlow<List<CardData>> = _cards
 
+    companion object {
+        const val TAG = "AlarmViewModel"
+    }
     fun addCard(card: CardData) {
-        cards = cards + card
-    }
-
-    fun removeCard(cardId: String) {
-        cards = cards.filterNot { it.id == cardId }
-    }
-
-    fun toggleSwitch(cardId: String) {
-        cards = cards.map {
-            if (it.id == cardId) it.copy(switchValue = !it.switchValue) else it
+        viewModelScope.launch {
+            val newList = _cards.value.toMutableList()
+            newList.add(card)
+            _cards.value = newList
+            Log.d(TAG, "addCard: カード追加後のリストサイズ: ${_cards.value.size}")
+            Log.d(TAG, "addCard: カード追加: ${_cards.value}")
         }
     }
 
-    fun addChildToCard(parentId: String, childTime: LocalTime) {
-        val childCard = CardData(
-            id = java.util.UUID.randomUUID().toString(),
-            isParent = false,
-            childId = parentId,
-            alarmTime = childTime,
-            switchValue = true
-        )
-        addCard(childCard)
+
+    fun removeCard(cardId: String) {
+        viewModelScope.launch {
+            _cards.value = _cards.value.filterNot { it.id == cardId }
+        }
+    }
+
+    fun toggleSwitch(cardId: String, isChecked: Boolean) {
+        viewModelScope.launch {
+            _cards.value = _cards.value.map { card ->
+                if (card.id == cardId) card.copy(switchValue = isChecked) else card
+            }
+        }
     }
 }

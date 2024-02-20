@@ -1,10 +1,13 @@
 package com.example.alarm_clock_kotlin
 
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.Icon
@@ -15,24 +18,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.alarm_clock_kotlin.ui.theme.Alarm_clock_kotlinTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, alarmViewModel: AlarmViewModel = viewModel()) {
+    val cards = alarmViewModel.cards.collectAsState()
 
     LazyColumn(
-        Modifier
+        modifier = Modifier
             .background(color = Color.Black)
             .fillMaxSize()
     ) {
-        item {
-            alarmCard()
+        items(cards.value) { card ->
+            Log.d(TAG, "きているのか$cards")
+            AlarmCard(navController = navController, cardData = card, viewModel = alarmViewModel)
         }
     }
+
 
     Box(
         modifier = Modifier
@@ -53,15 +58,6 @@ fun HomeScreen(navController: NavController) {
             )
         }
     }
-
 }
 
 
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    Alarm_clock_kotlinTheme {
-//        HomeScreen()
-//    }
-//}

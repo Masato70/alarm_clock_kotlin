@@ -1,24 +1,27 @@
 package com.example.alarm_clock_kotlin
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-
+import androidx.navigation.NavController
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.alarm_clock_kotlin.ui.theme.Alarm_clock_kotlinTheme
+import java.time.format.DateTimeFormatter
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun alarmCard() {
+fun AlarmCard(navController: NavController, cardData: CardData, viewModel: AlarmViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,29 +37,37 @@ fun alarmCard() {
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "02:00",
+                    text = cardData.alarmTime.toString(),
                     style = TextStyle(fontWeight = FontWeight.Bold),
-                    color = Color.White,
+                    color = if (cardData.switchValue) Color.White else Color.Gray,
                     fontSize = 60.sp,
-//                    fontSize = if (switchValue) 50.sp else 49.sp,
-//                    color = if (switchValue) Color.White else Color.Gray
                 )
                 Switch(
-                    checked = null == true,
-                    onCheckedChange = {},
+                    checked = cardData.switchValue,
+                    onCheckedChange = { isChecked ->
+                        viewModel.toggleSwitch(
+                            cardData.id,
+                            isChecked
+                        )
+                    },
                     modifier = Modifier
                         .align(CenterVertically)
                         .scale(1.2f)
 
                 )
             }
-            TextButton(onClick = { /*TODO*/ }, Modifier.padding(start = 15.dp)) {
+            TextButton(
+                onClick = { navController.navigate("alarmTimePicker") },
+                Modifier.padding(start = 15.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "追加",
                     tint = Color(0xFF00FFFF)
                 )
-                Text(text = "時間を追加する", color = Color(0xFF00FFFF))
+                Text(
+                    text = "時間を追加する", color = Color(0xFF00FFFF),
+                )
             }
 
             Row(
@@ -85,10 +96,10 @@ fun alarmCard() {
     }
 }
 
-@Preview
-@Composable
-fun PreviewAlarmCard() {
-    Alarm_clock_kotlinTheme {
-        alarmCard()
-    }
-}
+//@Preview
+//@Composable
+//fun PreviewAlarmCard() {
+//    Alarm_clock_kotlinTheme {
+//        alarmCard()
+//    }
+//}

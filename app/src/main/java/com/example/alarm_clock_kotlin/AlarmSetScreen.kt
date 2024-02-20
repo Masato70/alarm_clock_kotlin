@@ -26,16 +26,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AlarmTimePicker() {
+fun AlarmTimePicker(navController: NavController,  viewModel: AlarmViewModel = viewModel()) {
     var time by remember { mutableStateOf(LocalTime.now()) }
     val context = LocalContext.current
+//    val viewModel: AlarmViewModel = viewModel()
 
     fun showTimePicker() {
         val picker = MaterialTimePicker.Builder()
@@ -58,17 +62,17 @@ fun AlarmTimePicker() {
 
     Column(
         modifier = Modifier
-            .fillMaxSize() // 画面全体を有効にする
-            .background(Color.Black), // 背景色を黒に設定
-        horizontalAlignment = Alignment.CenterHorizontally, // 水平方向の中央揃え
-        verticalArrangement = Arrangement.Center // 垂直方向の中央揃え
+            .fillMaxSize()
+            .background(Color.Black),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
 
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
             modifier = Modifier.clickable(onClick = { showTimePicker() }),
-            color = Color.White, // テキストの色を白に設定
+            color = Color.White,
             style = TextStyle(fontSize = 100.sp)
         )
 
@@ -76,23 +80,30 @@ fun AlarmTimePicker() {
 
         Button(
             onClick = {
-                // ボタンがクリックされたときの動作
+                val newCard = CardData(
+                    id = UUID.randomUUID().toString(),
+                    isParent = true,
+                    childId = null,
+                    alarmTime = time,
+                    switchValue = false
+                )
+                viewModel.addCard(newCard)
+//                navController.navigate("homeScreen")
             },
             modifier = Modifier
-                .padding(16.dp) // ボタンの周りに余白を追加
-                .height(60.dp) // ボタンの高さを指定
-                .fillMaxWidth(), // ボタンの幅を最大にする
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Cyan), // ボタンの背景色を水色に設定
+                .padding(16.dp)
+                .height(60.dp)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Cyan),
         ) {
             Text(
                 "セットする",
                 style = TextStyle(
-                    fontSize = 20.sp, // テキストのフォントサイズを大きくする
-                    fontWeight = FontWeight.Bold // テキストを太くする
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
             )
         }
-
     }
 }
 
