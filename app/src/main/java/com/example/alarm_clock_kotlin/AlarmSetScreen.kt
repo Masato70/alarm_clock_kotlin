@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -36,9 +37,12 @@ import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AlarmTimePicker(navController: NavController,  viewModel: AlarmViewModel = viewModel()) {
+fun AlarmTimePicker(navController: NavController,) {
     var time by remember { mutableStateOf(LocalTime.now()) }
     val context = LocalContext.current
+
+    val viewModelStoreOwner = context as ViewModelStoreOwner
+    val viewModel: AlarmViewModel = viewModel(viewModelStoreOwner = viewModelStoreOwner)
 //    val viewModel: AlarmViewModel = viewModel()
 
     fun showTimePicker() {
@@ -85,10 +89,10 @@ fun AlarmTimePicker(navController: NavController,  viewModel: AlarmViewModel = v
                     isParent = true,
                     childId = null,
                     alarmTime = time,
-                    switchValue = false
+                    switchValue = true
                 )
                 viewModel.addCard(newCard)
-//                navController.navigate("homeScreen")
+                navController.navigate("homeScreen")
             },
             modifier = Modifier
                 .padding(16.dp)

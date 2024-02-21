@@ -95,11 +95,3 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun PreviewAlarmCard() {
-//    Alarm_clock_kotlinTheme {
-//        alarmCard()
-//    }
-//}

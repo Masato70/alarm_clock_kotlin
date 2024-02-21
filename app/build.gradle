@@ -59,6 +59,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation "androidx.compose.material3:material3:1.1.0"
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation "androidx.navigation:navigation-compose:2.4.0"
     implementation "com.google.accompanist:accompanist-navigation-animation:0.16.1"
@@ -67,4 +68,5 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
 }

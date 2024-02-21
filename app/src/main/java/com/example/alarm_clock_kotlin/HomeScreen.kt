@@ -18,14 +18,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(navController: NavController, alarmViewModel: AlarmViewModel = viewModel()) {
-    val cards = alarmViewModel.cards.collectAsState()
+fun HomeScreen(navController: NavController) {
+    val context = LocalContext.current
+    val viewModelStoreOwner = context as ViewModelStoreOwner
+    val viewModel: AlarmViewModel = viewModel(viewModelStoreOwner = viewModelStoreOwner)
+    val cards = viewModel.cards.collectAsState()
 
     LazyColumn(
         modifier = Modifier
@@ -34,7 +39,7 @@ fun HomeScreen(navController: NavController, alarmViewModel: AlarmViewModel = vi
     ) {
         items(cards.value) { card ->
             Log.d(TAG, "きているのか$cards")
-            AlarmCard(navController = navController, cardData = card, viewModel = alarmViewModel)
+            AlarmCard(navController = navController, cardData = card, viewModel = viewModel)
         }
     }
 
