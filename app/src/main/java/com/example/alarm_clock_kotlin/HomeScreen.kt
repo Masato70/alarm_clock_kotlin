@@ -30,15 +30,18 @@ fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModelStoreOwner = context as ViewModelStoreOwner
     val viewModel: AlarmViewModel = viewModel(viewModelStoreOwner = viewModelStoreOwner)
-    val cards = viewModel.cards.collectAsState()
+
+    // 親アラームカードを時刻順にソート
+    val parentCards = viewModel.cards.collectAsState().value
+        .filter { it.isParent == true }
+        .sortedBy { it.alarmTime }
 
     LazyColumn(
         modifier = Modifier
             .background(color = Color.Black)
             .fillMaxSize()
     ) {
-        items(cards.value) { card ->
-            Log.d(TAG, "きているのか$cards")
+        items(parentCards, key = { card -> card.id }) { card ->
             AlarmCard(navController = navController, cardData = card, viewModel = viewModel)
         }
     }

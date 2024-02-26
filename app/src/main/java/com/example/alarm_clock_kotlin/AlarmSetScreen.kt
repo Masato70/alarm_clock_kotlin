@@ -1,8 +1,8 @@
 package com.example.alarm_clock_kotlin
 
+import android.content.ContentValues.TAG
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,30 +31,30 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AlarmTimePicker(navController: NavController,) {
-    var time by remember { mutableStateOf(LocalTime.now()) }
+fun AlarmTimePicker(navController: NavController, parentId: String? = null) {
+    var dateTime by remember { mutableStateOf(LocalDateTime.now()) }
     val context = LocalContext.current
 
     val viewModelStoreOwner = context as ViewModelStoreOwner
     val viewModel: AlarmViewModel = viewModel(viewModelStoreOwner = viewModelStoreOwner)
-//    val viewModel: AlarmViewModel = viewModel()
 
     fun showTimePicker() {
         val picker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_24H)
-            .setHour(time.hour)
-            .setMinute(time.minute)
+            .setHour(dateTime.hour)
+            .setMinute(dateTime.minute)
             .setTitleText("Select Alarm Time")
             .build()
 
         picker.addOnPositiveButtonClickListener {
-            time = LocalTime.of(picker.hour, picker.minute)
+            dateTime = dateTime.withHour(picker.hour).withMinute(picker.minute)
         }
 
         picker.show((context as FragmentActivity).supportFragmentManager, "tag")
@@ -71,10 +71,9 @@ fun AlarmTimePicker(navController: NavController,) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
+            text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm")), // `time`から`dateTime`に更新
             modifier = Modifier.clickable(onClick = { showTimePicker() }),
             color = Color.White,
             style = TextStyle(fontSize = 100.sp)
@@ -84,14 +83,19 @@ fun AlarmTimePicker(navController: NavController,) {
 
         Button(
             onClick = {
-                val newCard = CardData(
-                    id = UUID.randomUUID().toString(),
-                    isParent = true,
-                    childId = null,
-                    alarmTime = time,
-                    switchValue = true
-                )
-                viewModel.addCard(newCard)
+                val timeOnly = dateTime.toLocalTime().withSecond(0).withNano(0) // 秒とナノ秒を0に設定
+                if (parentId == null) {
+                    val newCard = CardData(
+                        id = UUID.randomUUID().toString(),
+                        isParent = true,
+                        childId = null,
+                        alarmTime = timeOnly, // `time`から`dateTime`に更新
+                        switchValue = true
+                    )
+                    viewModel.addCard(newCard)
+                } else {
+                    viewModel.addChildCard(parentId, dateTime.toLocalTime()) // `time`から`dateTime`に更新
+                }
                 navController.navigate("homeScreen")
             },
             modifier = Modifier
@@ -105,6 +109,26 @@ fun AlarmTimePicker(navController: NavController,) {
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Button(
+            onClick = { navController.navigateUp() },
+            modifier = Modifier
+                .padding(16.dp)
+                .height(60.dp)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
+        ) {
+            Text(
+                "戻る",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             )
         }

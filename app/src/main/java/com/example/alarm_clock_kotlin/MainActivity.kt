@@ -1,5 +1,6 @@
 package com.example.alarm_clock_kotlin
 
+import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -13,8 +14,13 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.alarm_clock_kotlin.ui.theme.Alarm_clock_kotlinTheme
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,15 +41,25 @@ class MainActivity : AppCompatActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MyApp(navController: NavHostController, ) {
+fun MyApp(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "homeScreen") {
         composable("homeScreen") {
             HomeScreen(navController)
         }
+        composable("alarmTimePicker/{parentId}") {
+            val parentId = it.arguments?.getString("parentId")
+            AlarmTimePicker(navController, parentId)
+        }
         composable("alarmTimePicker") {
-            AlarmTimePicker(navController)
+            AlarmTimePicker(navController, null)
         }
     }
+}
+
+
+@HiltAndroidApp
+class MyApplication : Application() {
+    // 必要に応じてカスタムの初期化コードをここに追加
 }
 
 
