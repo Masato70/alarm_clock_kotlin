@@ -6,34 +6,32 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.example.alarm_clock_kotlin.ui.theme.Alarm_clock_kotlinTheme
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    private lateinit var permissionUtils: PermissionUtils
+    private lateinit var alarmViewModel: AlarmViewModel
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // アクティビティスコープでViewModelを取得
-        val alarmViewModel: AlarmViewModel by viewModels()
+        permissionUtils = PermissionUtils(this)
+        permissionUtils.checkAndRequestNotificationPermission()
+        permissionUtils.checkAndRequestAlarmPermission()
+
 
         setContent {
             Alarm_clock_kotlinTheme {
-                // NavControllerのインスタンスを作成
                 val navController = rememberNavController()
-                // NavHostをセットアップし、viewModelを各画面に渡す
-                MyApp(navController,)
+                MyApp(navController)
             }
         }
     }
@@ -61,13 +59,3 @@ fun MyApp(navController: NavHostController) {
 class MyApplication : Application() {
     // 必要に応じてカスタムの初期化コードをここに追加
 }
-
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    Alarm_clock_kotlinTheme {
-//        Greeting("Android")
-//    }
-//}

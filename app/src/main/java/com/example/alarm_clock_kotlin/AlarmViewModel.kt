@@ -28,12 +28,12 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.inject.Inject
-import javax.inject.Singleton
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class AlarmViewModel @Inject constructor(
+    private val alarmManagerHelper: AlarmManagerHelper,
     private val cardRepository: CardRepository,
 ) : ViewModel() {
     private val _cards = MutableStateFlow<List<CardData>>(emptyList())
@@ -43,8 +43,12 @@ class AlarmViewModel @Inject constructor(
         loadCards()
     }
 
-    fun addCard(card: CardData) {
-        updateAndSaveCards { it + card }
+    fun addParentCard(card: CardData) {
+        viewModelScope.launch {
+            updateAndSaveCards { it + card }
+            Log.d(TAG, card.id)
+            alarmManagerHelper.setAlarm(card.id, card.alarmTime)
+        }
     }
 
     fun addChildCard(parentId: String, childAlarmTime: LocalTime) {
@@ -56,26 +60,66 @@ class AlarmViewModel @Inject constructor(
             switchValue = true
         )
         updateAndSaveCards { it + childCard }
+        alarmManagerHelper.setAlarm(childCard.id, childCard.alarmTime)
     }
 
     fun removeCard(cardId: String) {
-        updateAndSaveCards { it.filterNot { card -> card.id == cardId || card.childId == cardId } }
-    }
+        val idsToCancelAlarm = mutableListOf<String>()
 
-    fun toggleSwitch(cardId: String, isChecked: Boolean) {
+        // カードをフィルタリングして削除し、削除対象のカードのIDを取得
         updateAndSaveCards { cards ->
-            cards.map { card ->
-                if (card.id == cardId) card.copy(switchValue = isChecked) else card
+            cards.filterNot { card ->
+                val isTargetCard = card.id == cardId || card.childId == cardId
+                if (isTargetCard) {
+                    // 削除するカードが見つかった場合、アラームをキャンセルするためのIDリストに追加
+                    idsToCancelAlarm.add(card.id)
+                }
+                isTargetCard
             }
+        }
+
+        // 特定したすべてのカードのアラームをキャンセル
+        idsToCancelAlarm.forEach { id ->
+            alarmManagerHelper.cancelAlarm(id)
         }
     }
 
-    private fun loadCards() {
+
+    fun toggleSwitch(cardId: String, isChecked: Boolean) {
+        var alarmTimeForCard: LocalTime? = null
+
+        updateAndSaveCards { cards ->
+            cards.map { card ->
+                if (card.id == cardId) {
+                    alarmTimeForCard = card.alarmTime
+                    card.copy(switchValue = isChecked)
+                } else card
+            }
+        }
+
+        if (isChecked) {
+            alarmTimeForCard?.let {
+                alarmManagerHelper.setAlarm(cardId, it)
+            }
+        } else {
+            alarmManagerHelper.cancelAlarm(cardId)
+        }
+    }
+
+     fun loadCards() {
         viewModelScope.launch {
             cardRepository.cards.collect { cardsList ->
                 _cards.value = cardsList
+                setAlarmsForSwitchedOnCards(cardsList)
             }
         }
+    }
+
+     fun setAlarmsForSwitchedOnCards(cardsList: List<CardData>) {
+        cardsList.filter { it.switchValue }
+            .forEach { card ->
+                alarmManagerHelper.setAlarm(card.id, card.alarmTime)
+            }
     }
 
     fun getChildAlarms(parentId: String): List<CardData> {

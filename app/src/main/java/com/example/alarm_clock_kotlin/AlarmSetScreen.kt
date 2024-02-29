@@ -1,8 +1,6 @@
 package com.example.alarm_clock_kotlin
 
-import android.content.ContentValues.TAG
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,7 +30,6 @@ import androidx.navigation.NavController
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
@@ -73,7 +70,7 @@ fun AlarmTimePicker(navController: NavController, parentId: String? = null) {
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm")), // `time`から`dateTime`に更新
+            text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm")),
             modifier = Modifier.clickable(onClick = { showTimePicker() }),
             color = Color.White,
             style = TextStyle(fontSize = 100.sp)
@@ -83,18 +80,18 @@ fun AlarmTimePicker(navController: NavController, parentId: String? = null) {
 
         Button(
             onClick = {
-                val timeOnly = dateTime.toLocalTime().withSecond(0).withNano(0) // 秒とナノ秒を0に設定
+                val timeOnly = dateTime.toLocalTime().withSecond(0).withNano(0)
                 if (parentId == null) {
                     val newCard = CardData(
                         id = UUID.randomUUID().toString(),
                         isParent = true,
                         childId = null,
-                        alarmTime = timeOnly, // `time`から`dateTime`に更新
+                        alarmTime = timeOnly,
                         switchValue = true
                     )
-                    viewModel.addCard(newCard)
+                    viewModel.addParentCard(newCard)
                 } else {
-                    viewModel.addChildCard(parentId, dateTime.toLocalTime()) // `time`から`dateTime`に更新
+                    viewModel.addChildCard(parentId, dateTime.toLocalTime())
                 }
                 navController.navigate("homeScreen")
             },
