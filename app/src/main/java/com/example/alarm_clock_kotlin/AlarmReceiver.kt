@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.ContentValues
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -14,12 +13,18 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.alarm_clock_kotlin.data.CardRepository
+import com.example.alarm_clock_kotlin.utils.AlarmManagerHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -34,14 +39,32 @@ class AlarmReceiver : BroadcastReceiver() {
         private const val TAG = "AlarmReceiver"
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             "STOP_ALARM" -> handleStopAlarmAction(context, intent)
-//            Intent.ACTION_MY_PACKAGE_REPLACED -> processAlarmData(context)
-//            Intent.ACTION_BOOT_COMPLETED -> processAlarmData(context)
+            Intent.ACTION_MY_PACKAGE_REPLACED -> processAlarmData(context)
+            Intent.ACTION_BOOT_COMPLETED -> processAlarmData(context)
             else -> {
                 val setAlarmId = intent.getStringExtra("id")
                 startAlarmProcess(context, setAlarmId)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun processAlarmData(context: Context) {
+        // CardRepositoryを初期化（この例では、手動で初期化しています）
+        val cardRepository = CardRepository(context)
+
+        // ここでは、コルーチンを使って非同期操作を行います
+        CoroutineScope(Dispatchers.IO).launch {
+            val cards = cardRepository.cards.first() // 最新のカードデータを取得
+
+            // スイッチがオンになっているカードに対してアラームをセット
+            cards.filter { it.switchValue }.forEach { card ->
+                val alarmManagerHelper = AlarmManagerHelper(context)
+                alarmManagerHelper.setAlarm(card.id, card.alarmTime)
             }
         }
     }
@@ -72,14 +95,21 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     private fun startAlarmProcess(context: Context, setAlarmId: String?) {
-        if (setAlarmId == null) {
-            return
-        }
+        if (setAlarmId == null)  return
         try {
             if (isAlarmPlayed.compareAndSet(false, true)) {
                 stopAlarm()
                 startAlarm(context, setAlarmId)
                 showNotificationBasedOnLockStatus(context, setAlarmId)
+
+                //スイッチオフにする
+                Log.d(TAG, "!!!スイッチをオフにするところ")
+                Intent().also { intent ->
+                    Log.d(TAG, "!!!スイッチオフできてる?")
+                    intent.action = "com.example.ACTION_ALARM_TRIGGERED"
+                    intent.putExtra("alarm_id", setAlarmId)
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+                }
 
             }
         } catch (e: Exception) {
@@ -139,7 +169,6 @@ class AlarmReceiver : BroadcastReceiver() {
     private fun showNotification(context: Context, setAlarmId: String) {
 
         val notificationId = setAlarmId.hashCode()
-        Log.d(ContentValues.TAG, "通知を表示させます！ on thread ${Thread.currentThread().id}")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "My Channel"
             val descriptionText = "This is my channel"
@@ -153,7 +182,6 @@ class AlarmReceiver : BroadcastReceiver() {
         }
 
         val fullScreenIntent = Intent(context, AlarmStopActivity::class.java).apply {
-            putExtra("id", setAlarmId)
             Log.d(ContentValues.TAG, "setAlarmIdはこちら $setAlarmId")
         }
         val fullScreenPendingIntent = PendingIntent.getActivity(

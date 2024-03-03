@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin
+package com.example.alarm_clock_kotlin.data
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.alarm_clock_kotlin.utils.AlarmManagerHelper
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
@@ -85,24 +86,52 @@ class AlarmViewModel @Inject constructor(
     }
 
 
-    fun toggleSwitch(cardId: String, isChecked: Boolean) {
-        var alarmTimeForCard: LocalTime? = null
+//    fun toggleSwitch(cardId: String, isChecked: Boolean) {
+//        var alarmTimeForCard: LocalTime? = null
+//
+//        updateAndSaveCards { cards ->
+//            cards.map { card ->
+//                if (card.id == cardId) {
+//                    alarmTimeForCard = card.alarmTime
+//                    card.copy(switchValue = isChecked)
+//                } else card
+//            }
+//        }
+//
+//        if (isChecked) {
+//            alarmTimeForCard?.let {
+//                alarmManagerHelper.setAlarm(cardId, it)
+//            }
+//        } else {
+//            alarmManagerHelper.cancelAlarm(cardId)
+//        }
+//    }
 
-        updateAndSaveCards { cards ->
-            cards.map { card ->
+    fun toggleSwitch(cardId: String, isChecked: Boolean) {
+        viewModelScope.launch {
+            Log.d(TAG, "!!!スイッチをオフにしたよ")
+            var alarmTimeForCard: LocalTime? = null
+
+            // カードのスイッチ状態を更新し、その変更をDataStoreに保存
+            val updatedCards = _cards.value.map { card ->
                 if (card.id == cardId) {
                     alarmTimeForCard = card.alarmTime
                     card.copy(switchValue = isChecked)
-                } else card
+                } else {
+                    card
+                }
             }
-        }
+            cardRepository.saveCards(updatedCards)
+            _cards.value = updatedCards
 
-        if (isChecked) {
-            alarmTimeForCard?.let {
-                alarmManagerHelper.setAlarm(cardId, it)
+            // スイッチがオンの場合はアラームをセットし、オフの場合はキャンセル
+            if (isChecked) {
+                alarmTimeForCard?.let {
+                    alarmManagerHelper.setAlarm(cardId, it)
+                }
+            } else {
+                alarmManagerHelper.cancelAlarm(cardId)
             }
-        } else {
-            alarmManagerHelper.cancelAlarm(cardId)
         }
     }
 
@@ -156,6 +185,7 @@ class CardRepository @Inject constructor(@ApplicationContext private val context
     private val Context.cardDataStore by preferencesDataStore(name = "card_data_store")
 
     suspend fun saveCards(cards: List<CardData>) {
+        Log.d(TAG, "!!!dataStoreでセーブ")
         val jsonData = gson.toJson(cards)
         context.cardDataStore.edit { preferences ->
             preferences[CARDS_KEY] = jsonData

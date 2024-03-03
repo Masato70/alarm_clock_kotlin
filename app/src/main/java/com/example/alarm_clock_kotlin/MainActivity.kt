@@ -1,6 +1,10 @@
 package com.example.alarm_clock_kotlin
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -10,8 +14,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavHostController
+import com.example.alarm_clock_kotlin.data.AlarmViewModel
 import com.example.alarm_clock_kotlin.ui.theme.Alarm_clock_kotlinTheme
+import com.example.alarm_clock_kotlin.utils.PermissionUtils
+import com.example.alarm_clock_kotlin.view.AlarmTimePicker
+import com.example.alarm_clock_kotlin.view.HomeScreen
+import com.example.alarm_clock_kotlin.view.ShowTutorialIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 
@@ -19,6 +30,17 @@ import dagger.hilt.android.HiltAndroidApp
 class MainActivity : AppCompatActivity() {
     private lateinit var permissionUtils: PermissionUtils
     private lateinit var alarmViewModel: AlarmViewModel
+    // BroadcastReceiverのインスタンスを生成
+    private val alarmTriggeredReceiver = object : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val alarmId = intent?.getStringExtra("alarm_id")
+            alarmId?.let {
+                // ViewModelの関数を呼び出し、スイッチをオフにする
+                alarmViewModel.toggleSwitch(it, false)
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         permissionUtils = PermissionUtils(this)
         permissionUtils.checkAndRequestNotificationPermission()
         permissionUtils.checkAndRequestAlarmPermission()
-
+        alarmViewModel = ViewModelProvider(this)[AlarmViewModel::class.java]
 
         setContent {
             Alarm_clock_kotlinTheme {
@@ -34,12 +56,21 @@ class MainActivity : AppCompatActivity() {
                 MyApp(navController)
             }
         }
+        val filter = IntentFilter("com.example.ACTION_ALARM_TRIGGERED")
+        LocalBroadcastManager.getInstance(this).registerReceiver(alarmTriggeredReceiver, filter)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // アクティビティ破棄時にReceiverを解除
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(alarmTriggeredReceiver)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyApp(navController: NavHostController) {
+    ShowTutorialIfNeeded()
     NavHost(navController = navController, startDestination = "homeScreen") {
         composable("homeScreen") {
             HomeScreen(navController)

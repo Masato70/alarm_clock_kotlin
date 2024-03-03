@@ -32,6 +32,7 @@
             </intent-filter>
         </activity>
 
+
         <receiver android:name=".AlarmReceiver"
             android:enabled="true"
             android:exported="true">
@@ -42,6 +43,12 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".AlarmStopActivity"
+            android:showOnLockScreen="true"
+            android:exported="true">
+            <!-- You can add additional attributes here as needed -->
+        </activity>
     </application>
 
 

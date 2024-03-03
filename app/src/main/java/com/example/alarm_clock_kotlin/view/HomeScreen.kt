@@ -1,8 +1,6 @@
-package com.example.alarm_clock_kotlin
+package com.example.alarm_clock_kotlin.view
 
-import android.content.ContentValues.TAG
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.alarm_clock_kotlin.data.AlarmViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

@@ -1,20 +1,17 @@
-package com.example.alarm_clock_kotlin
+package com.example.alarm_clock_kotlin.utils
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.provider.Settings
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import com.example.alarm_clock_kotlin.AlarmReceiver
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalTime
 import java.util.Calendar
-import java.util.TimeZone
 import javax.inject.Inject
 
 class AlarmManagerHelper @Inject constructor(

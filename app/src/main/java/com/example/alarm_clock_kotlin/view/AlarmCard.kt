@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin
+package com.example.alarm_clock_kotlin.view
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -22,6 +22,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alarm_clock_kotlin.data.AlarmViewModel
+import com.example.alarm_clock_kotlin.data.CardData
 
 
 @OptIn(ExperimentalMaterialApi::class)

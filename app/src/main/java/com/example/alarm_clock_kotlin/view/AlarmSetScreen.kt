@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin
+package com.example.alarm_clock_kotlin.view
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -27,6 +27,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.alarm_clock_kotlin.data.AlarmViewModel
+import com.example.alarm_clock_kotlin.data.CardData
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.time.LocalDateTime
