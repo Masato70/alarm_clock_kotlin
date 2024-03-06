@@ -6,16 +6,10 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.alarm_clock_kotlin.utils.AlarmManagerHelper
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializer
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +20,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.inject.Inject
 
@@ -86,51 +79,30 @@ class AlarmViewModel @Inject constructor(
     }
 
 
-//    fun toggleSwitch(cardId: String, isChecked: Boolean) {
-//        var alarmTimeForCard: LocalTime? = null
-//
-//        updateAndSaveCards { cards ->
-//            cards.map { card ->
-//                if (card.id == cardId) {
-//                    alarmTimeForCard = card.alarmTime
-//                    card.copy(switchValue = isChecked)
-//                } else card
-//            }
-//        }
-//
-//        if (isChecked) {
-//            alarmTimeForCard?.let {
-//                alarmManagerHelper.setAlarm(cardId, it)
-//            }
-//        } else {
-//            alarmManagerHelper.cancelAlarm(cardId)
-//        }
-//    }
-
     fun toggleSwitch(cardId: String, isChecked: Boolean) {
         viewModelScope.launch {
-            Log.d(TAG, "!!!スイッチをオフにしたよ")
-            var alarmTimeForCard: LocalTime? = null
-
-            // カードのスイッチ状態を更新し、その変更をDataStoreに保存
+            Log.d(TAG, "ここじゃない")
             val updatedCards = _cards.value.map { card ->
-                if (card.id == cardId) {
-                    alarmTimeForCard = card.alarmTime
+                if (card.id == cardId || card.childId == cardId) {
+                    if (isChecked) {
+                        alarmManagerHelper.setAlarm(card.id, card.alarmTime)
+                    } else {
+                        alarmManagerHelper.cancelAlarm(card.id)
+                    }
                     card.copy(switchValue = isChecked)
                 } else {
                     card
                 }
             }
-            cardRepository.saveCards(updatedCards)
             _cards.value = updatedCards
+            cardRepository.saveCards(updatedCards)
 
-            // スイッチがオンの場合はアラームをセットし、オフの場合はキャンセル
-            if (isChecked) {
-                alarmTimeForCard?.let {
-                    alarmManagerHelper.setAlarm(cardId, it)
+            // If the toggled card is a parent, update all its children
+            if (_cards.value.any { it.id == cardId && it.isParent!! }) {
+                val children = _cards.value.filter { it.childId == cardId }
+                children.forEach { child ->
+                    toggleSwitch(child.id, isChecked) // This will set or cancel the alarm for each child
                 }
-            } else {
-                alarmManagerHelper.cancelAlarm(cardId)
             }
         }
     }
@@ -166,37 +138,22 @@ class AlarmViewModel @Inject constructor(
 
 @RequiresApi(Build.VERSION_CODES.O)
 class CardRepository @Inject constructor(@ApplicationContext private val context: Context) {
-
-    companion object {
-        private val CARDS_KEY = stringPreferencesKey("cards_data")
-
-        @RequiresApi(Build.VERSION_CODES.O)
-        private fun provideGson(): Gson = GsonBuilder()
-            .registerTypeAdapter(LocalTime::class.java, JsonSerializer<LocalTime> { src, _, _ ->
-                JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_TIME))
-            })
-            .registerTypeAdapter(LocalTime::class.java, JsonDeserializer { json, _, _ ->
-                LocalTime.parse(json.asJsonPrimitive.asString, DateTimeFormatter.ISO_LOCAL_TIME)
-            })
-            .create()
-    }
-
-    private val gson: Gson = provideGson()
-    private val Context.cardDataStore by preferencesDataStore(name = "card_data_store")
+    private val gson: Gson = AppDataStore.provideGson()
+    private val cardsKey = AppDataStore.provideCardsKey()
 
     suspend fun saveCards(cards: List<CardData>) {
         Log.d(TAG, "!!!dataStoreでセーブ")
         val jsonData = gson.toJson(cards)
-        context.cardDataStore.edit { preferences ->
-            preferences[CARDS_KEY] = jsonData
+        // 修正: AppDataStore.dataStore(context) -> context.dataStore
+        context.dataStore.edit { preferences ->
+            preferences[cardsKey] = jsonData
         }
     }
 
-    val cards: Flow<List<CardData>> = context.cardDataStore.data
-        .map { preferences ->
-            val jsonData = preferences[CARDS_KEY] ?: return@map emptyList<CardData>()
-            parseCardsJson(jsonData)
-        }
+    val cards: Flow<List<CardData>> = context.dataStore.data.map { preferences ->
+        val jsonData = preferences[cardsKey] ?: return@map emptyList<CardData>()
+        parseCardsJson(jsonData)
+    }
 
     private fun parseCardsJson(jsonData: String): List<CardData> {
         return try {

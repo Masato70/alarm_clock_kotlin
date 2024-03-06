@@ -18,11 +18,18 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.edit
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.alarm_clock_kotlin.data.AppDataStore
+import com.example.alarm_clock_kotlin.data.CardData
 import com.example.alarm_clock_kotlin.data.CardRepository
+import com.example.alarm_clock_kotlin.data.dataStore
 import com.example.alarm_clock_kotlin.utils.AlarmManagerHelper
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
@@ -30,6 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class AlarmReceiver : BroadcastReceiver() {
     private val isAlarmPlayed = AtomicBoolean(false)
     private val CHANNEL_Id = "${BuildConfig.APPLICATION_ID}.test"
+
 
     object MediaPlayerSingleton {
         var mediaPlayer: MediaPlayer? = null
@@ -94,6 +102,7 @@ class AlarmReceiver : BroadcastReceiver() {
         ) as? NotificationManager
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun startAlarmProcess(context: Context, setAlarmId: String?) {
         if (setAlarmId == null)  return
         try {
@@ -101,15 +110,27 @@ class AlarmReceiver : BroadcastReceiver() {
                 stopAlarm()
                 startAlarm(context, setAlarmId)
                 showNotificationBasedOnLockStatus(context, setAlarmId)
+                try {
+                    toggleSwitch(context, setAlarmId, false)
+//                    Intent().also { intent ->
+//                        Log.d(TAG, "!!!スイッチオフできてる?2")
+//                        intent.action = "com.example.ACTION_ALARM_TRIGGERED"
+//                        intent.putExtra("alarm_id", setAlarmId)
+//                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+//                    }
+
+                } catch (e: Exception) {
+//                    Intent().also { intent ->
+//                        Log.d(TAG, "!!!スイッチオフできてる?1")
+//                        intent.action = "com.example.ACTION_ALARM_TRIGGERED"
+//                        intent.putExtra("alarm_id", setAlarmId)
+//                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+//                    }
+                }
 
                 //スイッチオフにする
                 Log.d(TAG, "!!!スイッチをオフにするところ")
-                Intent().also { intent ->
-                    Log.d(TAG, "!!!スイッチオフできてる?")
-                    intent.action = "com.example.ACTION_ALARM_TRIGGERED"
-                    intent.putExtra("alarm_id", setAlarmId)
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
-                }
+
 
             }
         } catch (e: Exception) {
@@ -181,9 +202,14 @@ class AlarmReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
+//        val fullScreenIntent = Intent(context, AlarmStopActivity::class.java).apply {
+//            Log.d(ContentValues.TAG, "setAlarmIdはこちら $setAlarmId")
+//        }
+
         val fullScreenIntent = Intent(context, AlarmStopActivity::class.java).apply {
-            Log.d(ContentValues.TAG, "setAlarmIdはこちら $setAlarmId")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+
         val fullScreenPendingIntent = PendingIntent.getActivity(
             context,
             0,
@@ -193,11 +219,8 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val notification =
             NotificationCompat.Builder(context, CHANNEL_Id)
-//                .setContentTitle(context.getString(R.string.alarm))
-                .setContentTitle("タイトル")
-//                .setContentText(context.getString(R.string.swipe_to_stop_alarm))
-                .setContentText("ああああ")
-                .setContentText("スワイプして！")
+                .setContentTitle(context.getString(R.string.alarm))
+                .setContentText(context.getString(R.string.swipe_to_stop_alarm))
                 .setSmallIcon(R.drawable.icon_115930_256)
                 .setAutoCancel(true)
                 .setColor(Color.GRAY)
@@ -223,5 +246,37 @@ class AlarmReceiver : BroadcastReceiver() {
         showNotification(context, setAlarmId)
 
         Log.d(ContentValues.TAG, if (isLocked) "ロック画面" else "ロック画面じゃない！")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun toggleSwitch(context: Context, cardId: String, isChecked: Boolean) {
+        GlobalScope.launch {
+            Log.d(TAG, "ここでしょ")
+            val gson: Gson = AppDataStore.provideGson() // GsonのインスタンスをAppDataStoreから取得
+            val dataStore = context.dataStore // DataStoreのインスタンスをAppDataStoreから取得
+            val cardsKey = AppDataStore.provideCardsKey() // CARDS_KEYをAppDataStoreから取得
+
+            val preferences = dataStore.data.first() // 現在のPreferencesを取得
+
+            // 現在保存されているカードデータを取得
+            val cardsJson = preferences[cardsKey] ?: ""
+            val type = object : TypeToken<List<CardData>>() {}.type
+            var cards: List<CardData> = if (cardsJson.isNotEmpty()) gson.fromJson(cardsJson, type) else listOf()
+
+            // カードのスイッチ状態を更新
+            cards = cards.map { card ->
+                if (card.id == cardId) {
+                    card.copy(switchValue = isChecked)
+                } else {
+                    card
+                }
+            }
+
+            // 更新されたカードデータをDataStoreに保存
+            val updatedCardsJson = gson.toJson(cards)
+            dataStore.edit { settings ->
+                settings[cardsKey] = updatedCardsJson
+            }
+        }
     }
 }

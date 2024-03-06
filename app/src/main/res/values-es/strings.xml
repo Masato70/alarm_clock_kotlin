@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Compact Alarm</string>
+    <string name="set">Configurar</string>
+    <string name="back">Volver</string>
+    <string name="add_time">Agregar tiempo</string>
+    <string name="swipe_to_stop_alarm">Deslizar para detener la alarma</string>
+    <string name="alarm">Alarma</string>
 </resources>

@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Компактный будильник</string>
+    <string name="set">Установить</string>
+    <string name="back">Назад</string>
+    <string name="add_time">Добавить время</string>
+    <string name="swipe_to_stop_alarm">Свайп для остановки будильника</string>
+    <string name="alarm">Будильник</string>
 </resources>

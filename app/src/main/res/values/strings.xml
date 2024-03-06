@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">alarm_clock_kotlin</string>
+    <string name="app_name">Compact Alarm</string>
+    <string name="set">Set</string>
+    <string name="back">Back</string>
+    <string name="add_time">Add time</string>
+    <string name="swipe_to_stop_alarm">Swipe to stop alarm</string>
+    <string name="alarm">Alarm</string>
 </resources>

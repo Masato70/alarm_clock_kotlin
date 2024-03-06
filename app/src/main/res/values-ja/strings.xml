@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">コンパクトアラーム</string>
+    <string name="set">セットする</string>
+    <string name="back">戻る</string>
+    <string name="add_time">時間を追加する</string>
+    <string name="swipe_to_stop_alarm">スワイプしてアラームを停止</string>
+    <string name="alarm">アラーム</string>
+</resources>

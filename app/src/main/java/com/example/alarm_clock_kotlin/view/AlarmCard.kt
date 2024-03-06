@@ -1,6 +1,8 @@
 package com.example.alarm_clock_kotlin.view
 
+import android.content.ContentValues
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,10 +20,12 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alarm_clock_kotlin.R
 import com.example.alarm_clock_kotlin.data.AlarmViewModel
 import com.example.alarm_clock_kotlin.data.CardData
 
@@ -49,7 +53,7 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
     SwipeToDismiss(
         state = dismissState,
         directions = setOf(DismissDirection.StartToEnd),
-        dismissThresholds = { FractionalThreshold(0.25f) },
+        dismissThresholds = { FractionalThreshold(0.5f) },
         background = {
             val color = when {
                 isSwipedToEnd -> Color.Black
@@ -89,6 +93,7 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
                         Switch(
                             checked = cardData.switchValue,
                             onCheckedChange = { isChecked ->
+                                Log.d(ContentValues.TAG, "親からだけど")
                                 viewModel.toggleSwitch(
                                     cardData.id,
                                     isChecked
@@ -113,7 +118,8 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
                             tint = Color(0xFF00FFFF)
                         )
                         Text(
-                            text = "時間を追加する", color = Color(0xFF00FFFF),
+                            text = stringResource(R.string.add_time),
+                            color = Color(0xFF00FFFF),
                         )
                     }
 
@@ -155,7 +161,7 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
                                     Text(
                                         text = child.alarmTime.toString(),
                                         style = TextStyle(fontWeight = FontWeight.Bold),
-                                        color = Color.White,
+                                        color = if (child.switchValue) Color.White else Color.Gray,
                                         fontSize = 50.sp,
                                     )
                                     Switch(

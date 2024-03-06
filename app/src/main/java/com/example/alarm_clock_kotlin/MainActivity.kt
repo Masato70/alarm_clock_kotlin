@@ -2,11 +2,13 @@ package com.example.alarm_clock_kotlin
 
 import android.app.Application
 import android.content.BroadcastReceiver
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
@@ -46,11 +48,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         permissionUtils = PermissionUtils(this)
+        permissionUtils.checkAndRequestAlarmPermission(this)
         permissionUtils.checkAndRequestNotificationPermission()
-        permissionUtils.checkAndRequestAlarmPermission()
         alarmViewModel = ViewModelProvider(this)[AlarmViewModel::class.java]
 
         setContent {
+            Log.d(TAG, "早いかも")
             Alarm_clock_kotlinTheme {
                 val navController = rememberNavController()
                 MyApp(navController)

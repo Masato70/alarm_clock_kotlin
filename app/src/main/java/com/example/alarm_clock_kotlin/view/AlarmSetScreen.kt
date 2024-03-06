@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import com.google.android.material.timepicker.TimeFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import com.example.alarm_clock_kotlin.R
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -104,7 +106,7 @@ fun AlarmTimePicker(navController: NavController, parentId: String? = null) {
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Cyan),
         ) {
             Text(
-                "セットする",
+                text = stringResource(R.string.set),
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -123,7 +125,7 @@ fun AlarmTimePicker(navController: NavController, parentId: String? = null) {
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
         ) {
             Text(
-                "戻る",
+                text = stringResource(R.string.back),
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,

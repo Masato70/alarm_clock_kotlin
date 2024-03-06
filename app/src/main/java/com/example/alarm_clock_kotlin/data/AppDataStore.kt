@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin
+package com.example.alarm_clock_kotlin.data
 
 import android.content.Context
 import android.os.Build

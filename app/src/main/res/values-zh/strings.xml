@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">紧凑闹钟</string>
+    <string name="set">设置</string>
+    <string name="back">返回</string>
+    <string name="add_time">添加时间</string>
+    <string name="swipe_to_stop_alarm">滑动以停止闹钟</string>
+    <string name="alarm">闹钟</string>
 </resources>

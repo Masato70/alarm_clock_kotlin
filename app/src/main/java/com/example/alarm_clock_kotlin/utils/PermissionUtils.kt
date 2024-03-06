@@ -10,15 +10,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import android.Manifest
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.startActivity
 
 class PermissionUtils(private val activity: AppCompatActivity) {
 
-    fun checkAndRequestAlarmPermission() {
+
+    fun checkAndRequestAlarmPermission(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             if (!alarmManager.canScheduleExactAlarms()) {
                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                activity.startActivity(intent)
+                context.startActivity(intent)
             }
         }
     }
@@ -27,10 +30,9 @@ class PermissionUtils(private val activity: AppCompatActivity) {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Permission granted
+            // Permission granted, do something if needed
         } else {
-            // Permission denied
-            return@registerForActivityResult
+
         }
     }
 
@@ -48,5 +50,4 @@ class PermissionUtils(private val activity: AppCompatActivity) {
             }
         }
     }
-
 }

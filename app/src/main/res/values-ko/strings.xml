@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">컴팩트알람</string>
+    <string name="set">설정하기</string>
+    <string name="back">돌아가기</string>
+    <string name="add_time">시간 추가하기</string>
+    <string name="swipe_to_stop_alarm">스와이프하여 알람 중지</string>
+    <string name="alarm">알람</string>
 </resources>
+
