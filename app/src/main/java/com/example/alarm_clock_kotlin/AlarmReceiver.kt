@@ -27,6 +27,7 @@ import com.example.alarm_clock_kotlin.data.dataStore
 import com.example.alarm_clock_kotlin.utils.AlarmManagerHelper
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.vanpra.composematerialdialogs.datetime.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -36,7 +37,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class AlarmReceiver : BroadcastReceiver() {
     private val isAlarmPlayed = AtomicBoolean(false)
-    private val CHANNEL_Id = "${BuildConfig.APPLICATION_ID}.test"
+//    private val CHANNEL_Id = "${BuildConfig.APPLICATION_ID}.test"
+    private val CHANNEL_Id = "11"
 
 
     object MediaPlayerSingleton {
@@ -78,15 +80,12 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     private fun handleStopAlarmAction(context: Context, intent: Intent) {
-        Log.d(ContentValues.TAG, "アラームをストップします！ on thread ${Thread.currentThread().id}")
         stopAlarm()
 
         val setAlarmId = intent.getStringExtra("id")
         if (setAlarmId != null) {
             cancelNotification(context, setAlarmId)
-            Log.d(ContentValues.TAG, "Canceling notification for alarm ID: $setAlarmId")
         } else {
-            Log.d(ContentValues.TAG, "STOP_ALARM action received, but no alarm ID found.")
         }
     }
 
@@ -127,22 +126,14 @@ class AlarmReceiver : BroadcastReceiver() {
 //                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
 //                    }
                 }
-
-                //スイッチオフにする
-                Log.d(TAG, "!!!スイッチをオフにするところ")
-
-
             }
         } catch (e: Exception) {
-            Log.d(ContentValues.TAG, "Exception", e)
         }
     }
 
 
     private fun startAlarm(context: Context, newAlarmId: String) {
         try {
-            Log.d(TAG, "アラームスタート")
-            // 既存のMediaPlayerがあればリリース
             MediaPlayerSingleton.mediaPlayer?.let {
                 if (it.isPlaying) {
                     it.stop()
@@ -163,10 +154,6 @@ class AlarmReceiver : BroadcastReceiver() {
                 prepare()
                 start()
             }
-            Log.d(
-                "AlarmReceiver",
-                "mediaPlayer created: $MediaPlayerSingleton.mediaPlayer on thread ${Thread.currentThread().id}"
-            )
         } catch (e: Exception) {
             Log.e("AlarmReceiver", "Error playing alarm sound", e)
         }
@@ -189,7 +176,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     private fun showNotification(context: Context, setAlarmId: String) {
 
-        val notificationId = setAlarmId.hashCode()
+        val notificationId = setAlarmId.hashCode() // アラームIDから通知IDを生成
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "My Channel"
             val descriptionText = "This is my channel"
@@ -202,14 +189,7 @@ class AlarmReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
-//        val fullScreenIntent = Intent(context, AlarmStopActivity::class.java).apply {
-//            Log.d(ContentValues.TAG, "setAlarmIdはこちら $setAlarmId")
-//        }
-
-        val fullScreenIntent = Intent(context, AlarmStopActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-
+        val fullScreenIntent = Intent(context, AlarmStopActivity::class.java).apply {}
         val fullScreenPendingIntent = PendingIntent.getActivity(
             context,
             0,
@@ -245,13 +225,12 @@ class AlarmReceiver : BroadcastReceiver() {
         val isLocked = keyguardManager.isKeyguardLocked
         showNotification(context, setAlarmId)
 
-        Log.d(ContentValues.TAG, if (isLocked) "ロック画面" else "ロック画面じゃない！")
+//        Log.d(ContentValues.TAG, if (isLocked) "ロック画面" else "ロック画面じゃない！")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun toggleSwitch(context: Context, cardId: String, isChecked: Boolean) {
         GlobalScope.launch {
-            Log.d(TAG, "ここでしょ")
             val gson: Gson = AppDataStore.provideGson() // GsonのインスタンスをAppDataStoreから取得
             val dataStore = context.dataStore // DataStoreのインスタンスをAppDataStoreから取得
             val cardsKey = AppDataStore.provideCardsKey() // CARDS_KEYをAppDataStoreから取得

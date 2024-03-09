@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         alarmViewModel = ViewModelProvider(this)[AlarmViewModel::class.java]
 
         setContent {
-            Log.d(TAG, "早いかも")
             Alarm_clock_kotlinTheme {
                 val navController = rememberNavController()
                 MyApp(navController)

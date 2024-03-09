@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.alarm_clock_kotlin.R
+//import com.example.alarm_clock_kotlin.R
 import com.example.alarm_clock_kotlin.data.AlarmViewModel
 import com.example.alarm_clock_kotlin.data.CardData
 
@@ -93,7 +94,6 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
                         Switch(
                             checked = cardData.switchValue,
                             onCheckedChange = { isChecked ->
-                                Log.d(ContentValues.TAG, "親からだけど")
                                 viewModel.toggleSwitch(
                                     cardData.id,
                                     isChecked

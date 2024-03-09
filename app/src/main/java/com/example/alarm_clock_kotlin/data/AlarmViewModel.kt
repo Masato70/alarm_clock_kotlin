@@ -40,7 +40,6 @@ class AlarmViewModel @Inject constructor(
     fun addParentCard(card: CardData) {
         viewModelScope.launch {
             updateAndSaveCards { it + card }
-            Log.d(TAG, card.id)
             alarmManagerHelper.setAlarm(card.id, card.alarmTime)
         }
     }
@@ -81,7 +80,6 @@ class AlarmViewModel @Inject constructor(
 
     fun toggleSwitch(cardId: String, isChecked: Boolean) {
         viewModelScope.launch {
-            Log.d(TAG, "ここじゃない")
             val updatedCards = _cards.value.map { card ->
                 if (card.id == cardId || card.childId == cardId) {
                     if (isChecked) {
@@ -142,7 +140,6 @@ class CardRepository @Inject constructor(@ApplicationContext private val context
     private val cardsKey = AppDataStore.provideCardsKey()
 
     suspend fun saveCards(cards: List<CardData>) {
-        Log.d(TAG, "!!!dataStoreでセーブ")
         val jsonData = gson.toJson(cards)
         // 修正: AppDataStore.dataStore(context) -> context.dataStore
         context.dataStore.edit { preferences ->
