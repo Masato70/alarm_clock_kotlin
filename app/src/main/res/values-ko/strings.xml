@@ -6,5 +6,12 @@
     <string name="add_time">시간 추가하기</string>
     <string name="swipe_to_stop_alarm">스와이프하여 알람 중지</string>
     <string name="alarm">알람</string>
+    <string name="permission_required_title">권한 필요</string>
+    <string name="permission_required_message">이 앱은 알림을 게시하기 위한 권한이 필요합니다.</string>
+    <string name="grant_button">허용</string>
+    <string name="cancel_button">취소</string>
+    <string name="alarm_and_reminder_setup">알람 및 리마인더 설정</string>
+    <string name="permission_request_message">정확한 알람과 리마인더를 설정하기 위해 권한이 필요합니다. 설정 화면에서 이 앱의 권한을 허용해 주세요.</string>
+    <string name="open_settings_button">설정 열기</string>
 </resources>
 

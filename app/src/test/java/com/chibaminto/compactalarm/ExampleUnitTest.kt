@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin
+package com.chibaminto.compactalarm
 
 import org.junit.Test
 

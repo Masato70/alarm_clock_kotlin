@@ -6,4 +6,11 @@
     <string name="add_time">Agregar tiempo</string>
     <string name="swipe_to_stop_alarm">Deslizar para detener la alarma</string>
     <string name="alarm">Alarma</string>
+    <string name="permission_required_title">Permiso necesario</string>
+    <string name="permission_required_message">Esta aplicación requiere permiso para enviar notificaciones.</string>
+    <string name="grant_button">Conceder</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="alarm_and_reminder_setup">Configuración de Alarma y Recordatorio</string>
+    <string name="permission_request_message">Se requieren permisos para configurar alarmas y recordatorios precisos. Por favor, permite los permisos para esta aplicación en la pantalla de configuración.</string>
+    <string name="open_settings_button">Abrir configuraciones</string>
 </resources>

@@ -1,6 +1,5 @@
-package com.example.alarm_clock_kotlin.data
+package com.chibaminto.compactalarm.data
 
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -8,7 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.alarm_clock_kotlin.utils.AlarmManagerHelper
+import com.chibaminto.compactalarm.utils.AlarmManagerHelper
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken

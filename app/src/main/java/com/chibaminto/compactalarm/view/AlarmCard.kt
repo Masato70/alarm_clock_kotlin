@@ -1,8 +1,6 @@
-package com.example.alarm_clock_kotlin.view
+package com.chibaminto.compactalarm.view
 
-import android.content.ContentValues
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,10 +23,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.alarm_clock_kotlin.R
-//import com.example.alarm_clock_kotlin.R
-import com.example.alarm_clock_kotlin.data.AlarmViewModel
-import com.example.alarm_clock_kotlin.data.CardData
+import com.chibaminto.compactalarm.R
+import com.chibaminto.compactalarm.data.AlarmViewModel
+import com.chibaminto.compactalarm.data.CardData
 
 
 @OptIn(ExperimentalMaterialApi::class)

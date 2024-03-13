@@ -1,14 +1,12 @@
-package com.example.alarm_clock_kotlin
+package com.chibaminto.compactalarm
 
 import android.app.Application
 import android.content.BroadcastReceiver
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
@@ -17,28 +15,28 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavHostController
-import com.example.alarm_clock_kotlin.data.AlarmViewModel
-import com.example.alarm_clock_kotlin.ui.theme.Alarm_clock_kotlinTheme
-import com.example.alarm_clock_kotlin.utils.PermissionUtils
-import com.example.alarm_clock_kotlin.view.AlarmTimePicker
-import com.example.alarm_clock_kotlin.view.HomeScreen
-import com.example.alarm_clock_kotlin.view.ShowTutorialIfNeeded
+import com.chibaminto.compactalarm.data.AlarmViewModel
+import com.chibaminto.compactalarm.ui.theme.Alarm_clock_kotlinTheme
+import com.chibaminto.compactalarm.utils.PermissionUtils
+import com.chibaminto.compactalarm.view.AlarmTimePicker
+import com.chibaminto.compactalarm.view.HomeScreen
+import com.chibaminto.compactalarm.view.ShowTutorialIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var permissionUtils: PermissionUtils
     private lateinit var alarmViewModel: AlarmViewModel
-    // BroadcastReceiverのインスタンスを生成
     private val alarmTriggeredReceiver = object : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
             val alarmId = intent?.getStringExtra("alarm_id")
             alarmId?.let {
-                // ViewModelの関数を呼び出し、スイッチをオフにする
                 alarmViewModel.toggleSwitch(it, false)
             }
         }
@@ -58,14 +56,23 @@ class MainActivity : AppCompatActivity() {
                 MyApp(navController)
             }
         }
-        val filter = IntentFilter("com.example.ACTION_ALARM_TRIGGERED")
+
+        val filter = IntentFilter("com.chibamint.ACTION_ALARM_TRIGGERED")
         LocalBroadcastManager.getInstance(this).registerReceiver(alarmTriggeredReceiver, filter)
+
+        checkAndRequestPermissions()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // アクティビティ破棄時にReceiverを解除
         LocalBroadcastManager.getInstance(this).unregisterReceiver(alarmTriggeredReceiver)
+    }
+
+    private fun checkAndRequestPermissions() {
+        lifecycleScope.launch {
+            permissionUtils.checkAndRequestAlarmPermission(this@MainActivity)
+            permissionUtils.checkAndRequestNotificationPermission()
+        }
     }
 }
 
@@ -90,5 +97,4 @@ fun MyApp(navController: NavHostController) {
 
 @HiltAndroidApp
 class MyApplication : Application() {
-    // 必要に応じてカスタムの初期化コードをここに追加
 }

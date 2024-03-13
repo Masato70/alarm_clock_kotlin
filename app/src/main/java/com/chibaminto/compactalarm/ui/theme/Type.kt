@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin.ui.theme
+package com.chibaminto.compactalarm.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

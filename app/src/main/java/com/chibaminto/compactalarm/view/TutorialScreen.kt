@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin.view
+package com.chibaminto.compactalarm.view
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -9,7 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Dialog
-import com.example.alarm_clock_kotlin.R
+import com.chibaminto.compactalarm.R
+
 
 @Composable
     fun ShowTutorialIfNeeded() {

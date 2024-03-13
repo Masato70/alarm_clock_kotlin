@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin.data
+package com.chibaminto.compactalarm.data
 
 import androidx.compose.runtime.Immutable
 import java.time.LocalTime

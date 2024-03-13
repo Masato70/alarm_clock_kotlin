@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin.view
+package com.chibaminto.compactalarm.view
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.alarm_clock_kotlin.data.AlarmViewModel
+import com.chibaminto.compactalarm.data.AlarmViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -66,5 +66,4 @@ fun HomeScreen(navController: NavController) {
         }
     }
 }
-
 

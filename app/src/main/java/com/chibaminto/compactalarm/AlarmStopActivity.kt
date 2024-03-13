@@ -1,24 +1,13 @@
-package com.example.alarm_clock_kotlin
+package com.chibaminto.compactalarm
 
 import android.app.KeyguardManager
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.core.app.NotificationManagerCompat
-import com.example.alarm_clock_kotlin.AlarmReceiver
-import android.Manifest
 import android.app.Activity
 import android.widget.Button
-import com.example.alarm_clock_kotlin.R
 
 
 class AlarmStopActivity : Activity() {

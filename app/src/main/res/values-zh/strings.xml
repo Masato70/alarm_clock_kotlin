@@ -6,4 +6,11 @@
     <string name="add_time">添加时间</string>
     <string name="swipe_to_stop_alarm">滑动以停止闹钟</string>
     <string name="alarm">闹钟</string>
+    <string name="permission_required_title">需要权限</string>
+    <string name="permission_required_message">此应用程序需要发送通知的权限。</string>
+    <string name="grant_button">授予</string>
+    <string name="cancel_button">取消</string>
+    <string name="alarm_and_reminder_setup">闹钟和提醒设置</string>
+    <string name="permission_request_message">需要权限才能设置准确的闹钟和提醒。请在设置屏幕中允许此应用的权限。</string>
+    <string name="open_settings_button">打开设置</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin.utils
+package com.chibaminto.compactalarm.utils
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import com.example.alarm_clock_kotlin.AlarmReceiver
+import com.chibaminto.compactalarm.AlarmReceiver
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalTime
 import java.util.Calendar
@@ -23,7 +23,6 @@ class AlarmManagerHelper @Inject constructor(
         val alarmManager =
             ContextCompat.getSystemService(context, AlarmManager::class.java) as AlarmManager?
 
-        // LocalTimeからCalendarインスタンスを作成
         val now = Calendar.getInstance()
         val alarmCalendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, alarmTime.hour)

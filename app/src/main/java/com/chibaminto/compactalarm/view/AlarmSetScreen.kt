@@ -1,4 +1,4 @@
-package com.example.alarm_clock_kotlin.view
+package com.chibaminto.compactalarm.view
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -28,14 +28,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.alarm_clock_kotlin.data.AlarmViewModel
-import com.example.alarm_clock_kotlin.data.CardData
+import com.chibaminto.compactalarm.data.AlarmViewModel
+import com.chibaminto.compactalarm.data.CardData
+import com.chibaminto.compactalarm.R
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
-import com.example.alarm_clock_kotlin.R
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -52,6 +52,7 @@ fun AlarmTimePicker(navController: NavController, parentId: String? = null) {
             .setHour(dateTime.hour)
             .setMinute(dateTime.minute)
             .setTitleText("Select Alarm Time")
+            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
             .build()
 
         picker.addOnPositiveButtonClickListener {

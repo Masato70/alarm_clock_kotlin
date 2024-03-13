@@ -5,4 +5,11 @@
     <string name="add_time">Add time</string>
     <string name="swipe_to_stop_alarm">Swipe to stop alarm</string>
     <string name="alarm">Alarm</string>
+    <string name="permission_required_title">Permission Required</string>
+    <string name="permission_required_message">This app requires permission to post notifications.</string>
+    <string name="grant_button">Grant</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="alarm_and_reminder_setup">Alarm and Reminder Setup</string>
+    <string name="permission_request_message">Permissions are needed to set accurate alarms and reminders. Please allow permissions for this app in the settings screen.</string>
+    <string name="open_settings_button">Open settings</string>
 </resources>

@@ -6,4 +6,11 @@
     <string name="add_time">Добавить время</string>
     <string name="swipe_to_stop_alarm">Свайп для остановки будильника</string>
     <string name="alarm">Будильник</string>
+    <string name="permission_required_title">Требуется разрешение</string>
+    <string name="permission_required_message">Это приложение требует разрешения на отправку уведомлений.</string>
+    <string name="grant_button">Предоставить</string>
+    <string name="cancel_button">Отмена</string>
+    <string name="alarm_and_reminder_setup">Настройка будильника и напоминаний</string>
+    <string name="permission_request_message">Для установки точных будильников и напоминаний необходимы разрешения. Пожалуйста, разрешите доступ к этому приложению в настройках.</string>
+    <string name="open_settings_button">Открыть настройки</string>
 </resources>
