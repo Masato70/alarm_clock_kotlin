@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.core.app.NotificationManagerCompat
 import android.app.Activity
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Button
 
 
@@ -25,11 +27,9 @@ class AlarmStopActivity : Activity() {
             val alarmId = intent.getStringExtra("id")
 
             alarmId?.let {
-                val notificationId = it.hashCode() // アラームIDから通知IDを生成
+                val notificationId = it.hashCode()
                 NotificationManagerCompat.from(this).cancel(notificationId)
             }
-
-            // アラームを停止する処理
 
             val stopIntent = Intent(this, AlarmReceiver::class.java).apply {
                 action = "STOP_ALARM"
@@ -42,6 +42,7 @@ class AlarmStopActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        Log.d(TAG, "実行されているが")
 
         val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         if (!keyguardManager.isKeyguardLocked) {

@@ -48,7 +48,6 @@
             android:name="com.chibaminto.compactalarm.AlarmStopActivity"
             android:showOnLockScreen="true"
             android:exported="true">
-            <!-- You can add additional attributes here as needed -->
         </activity>
     </application>
 
