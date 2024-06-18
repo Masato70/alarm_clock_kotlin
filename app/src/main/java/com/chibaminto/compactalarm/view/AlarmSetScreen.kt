@@ -92,7 +92,8 @@ fun AlarmTimePicker(navController: NavController, parentId: String? = null) {
                         isParent = true,
                         childId = null,
                         alarmTime = timeOnly,
-                        switchValue = true
+                        switchValue = true,
+                        selectedWeekdays = emptyList()
                     )
                     viewModel.addParentCard(newCard)
                 } else {

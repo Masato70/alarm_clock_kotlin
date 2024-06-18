@@ -2,11 +2,15 @@ package com.chibaminto.compactalarm.view
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +30,11 @@ import androidx.compose.ui.unit.sp
 import com.chibaminto.compactalarm.R
 import com.chibaminto.compactalarm.data.AlarmViewModel
 import com.chibaminto.compactalarm.data.CardData
+import androidx.compose.material.DismissValue.Default
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.text.style.TextAlign
+import java.time.DayOfWeek
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -51,13 +60,20 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
     SwipeToDismiss(
         state = dismissState,
         directions = setOf(DismissDirection.StartToEnd),
-        dismissThresholds = { FractionalThreshold(0.5f) },
+        dismissThresholds = { FractionalThreshold(0.7f) },
         background = {
             val color = when {
                 isSwipedToEnd -> Color.Black
                 dismissState.dismissDirection == DismissDirection.StartToEnd -> Color.Red
                 else -> Color.Transparent
             }
+
+            val icon = Icons.Default.Delete
+
+            val scale by animateFloatAsState(
+                if (dismissState.targetValue == Default) 0.75f else 1f
+            )
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -65,6 +81,11 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
                     .padding(start = 20.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
+                Icon(
+                    icon,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.scale(scale)
+                )
             }
         },
         dismissContent = {
@@ -102,6 +123,11 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
 
                         )
                     }
+
+                    StylishWeekdaySelector(onSelectedWeekdaysChanged = { updatedList ->
+                        viewModel.saveSelectedWeekdays(cardData.id, updatedList)
+                    })
+
                     TextButton(
                         onClick = {
                             val route = "alarmTimePicker/${cardData.id}"
@@ -135,7 +161,7 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
                         SwipeToDismiss(
                             state = childDismissState,
                             directions = setOf(DismissDirection.StartToEnd),
-                            dismissThresholds = { FractionalThreshold(0.25f) },
+                            dismissThresholds = { FractionalThreshold(0.5f) },
                             background = {
                                 val backgroundColor =
                                     if (childDismissState.dismissDirection == DismissDirection.StartToEnd) Color.Red else Color.Transparent
@@ -180,3 +206,49 @@ fun AlarmCard(navController: NavController, cardData: CardData, viewModel: Alarm
         }
     )
 }
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun StylishWeekdaySelector(onSelectedWeekdaysChanged: (List<DayOfWeek>) -> Unit) {
+    val selectedWeekdays = remember { mutableStateListOf<DayOfWeek>() }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        DayOfWeek.entries.forEach { dayOfWeek ->
+            val isSelected = dayOfWeek in selectedWeekdays
+            Button(
+                onClick = {
+                    if (isSelected) {
+                        selectedWeekdays.remove(dayOfWeek)
+                    } else {
+                        selectedWeekdays.add(dayOfWeek)
+                    }
+                    onSelectedWeekdaysChanged(selectedWeekdays.toList())
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = if (isSelected) Color.White else Color.Gray.copy(alpha = 0.1f),
+                    contentColor = if (isSelected) Color.Black else Color.White
+                ),
+                border = BorderStroke(1.dp, Color.White),
+                shape = CircleShape,
+                modifier = Modifier.size(34.dp)
+            ) {
+                Text(
+                    text = dayOfWeek.getDisplayName(
+                        java.time.format.TextStyle.NARROW,
+                        Locale.getDefault()
+                    ),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.body2.copy(
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center
+                    )
+                )
+            }
+        }
+    }
+}
+

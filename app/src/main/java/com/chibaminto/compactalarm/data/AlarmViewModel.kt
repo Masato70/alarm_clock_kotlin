@@ -1,5 +1,6 @@
 package com.chibaminto.compactalarm.data
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalTime
 import java.util.UUID
 import javax.inject.Inject
@@ -49,7 +51,8 @@ class AlarmViewModel @Inject constructor(
             isParent = false,
             childId = parentId,
             alarmTime = childAlarmTime.withSecond(0).withNano(0),
-            switchValue = true
+            switchValue = true,
+            selectedWeekdays = emptyList()
         )
         updateAndSaveCards { it + childCard }
         alarmManagerHelper.setAlarm(childCard.id, childCard.alarmTime)
@@ -86,7 +89,12 @@ class AlarmViewModel @Inject constructor(
                     } else {
                         alarmManagerHelper.cancelAlarm(card.id)
                     }
-                    card.copy(switchValue = isChecked)
+                    val updatedCard = if (card.selectedWeekdays != null) {
+                        card.copy(switchValue = isChecked)
+                    } else {
+                        card.copy(switchValue = isChecked, selectedWeekdays = emptyList())
+                    }
+                    updatedCard
                 } else {
                     card
                 }
@@ -94,17 +102,36 @@ class AlarmViewModel @Inject constructor(
             _cards.value = updatedCards
             cardRepository.saveCards(updatedCards)
 
-            // If the toggled card is a parent, update all its children
             if (_cards.value.any { it.id == cardId && it.isParent!! }) {
                 val children = _cards.value.filter { it.childId == cardId }
                 children.forEach { child ->
-                    toggleSwitch(child.id, isChecked) // This will set or cancel the alarm for each child
+                    toggleSwitch(
+                        child.id,
+                        isChecked
+                    )
                 }
             }
         }
     }
 
-     fun loadCards() {
+    fun saveSelectedWeekdays(id: String, updatedList: List<DayOfWeek>) {
+        viewModelScope.launch {
+            // _cardsの値を更新
+            val updatedCards = _cards.value.map { card ->
+                if (card.id == id) {
+                    card.copy(selectedWeekdays = updatedList)
+                } else {
+                    card
+                }
+            }
+            _cards.value = updatedCards
+            cardRepository.saveCards(updatedCards)
+            Log.d(TAG, "曜日をアップデート$updatedCards")
+        }
+    }
+
+
+    fun loadCards() {
         viewModelScope.launch {
             cardRepository.cards.collect { cardsList ->
                 _cards.value = cardsList
@@ -113,7 +140,7 @@ class AlarmViewModel @Inject constructor(
         }
     }
 
-     fun setAlarmsForSwitchedOnCards(cardsList: List<CardData>) {
+    fun setAlarmsForSwitchedOnCards(cardsList: List<CardData>) {
         cardsList.filter { it.switchValue }
             .forEach { card ->
                 alarmManagerHelper.setAlarm(card.id, card.alarmTime)
@@ -139,8 +166,8 @@ class CardRepository @Inject constructor(@ApplicationContext private val context
     private val cardsKey = AppDataStore.provideCardsKey()
 
     suspend fun saveCards(cards: List<CardData>) {
+        Log.d(TAG, "通過")
         val jsonData = gson.toJson(cards)
-        // 修正: AppDataStore.dataStore(context) -> context.dataStore
         context.dataStore.edit { preferences ->
             preferences[cardsKey] = jsonData
         }
